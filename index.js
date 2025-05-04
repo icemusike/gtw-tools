@@ -108,8 +108,56 @@ app.get('/oauth-callback', (req, res) => {
     return res.status(400).send('Authorization code is required');
   }
   
-  // Redirect to the frontend with the code
-  res.redirect(`/?code=${code}`);
+  console.log('Received authorization code:', code);
+  
+  // Send an HTML page that displays the code
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Authorization Code</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .code-box {
+          background-color: #f5f5f5;
+          border-radius: 4px;
+          padding: 15px;
+          margin: 20px 0;
+          overflow-wrap: break-word;
+          word-break: break-all;
+        }
+        .btn {
+          display: inline-block;
+          background-color: #4f46e5;
+          color: white;
+          text-decoration: none;
+          padding: 10px 20px;
+          border-radius: 4px;
+          font-weight: 500;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Authorization Code Received</h1>
+      <p>Your authorization code has been successfully generated:</p>
+      <div class="code-box">
+        <code>${code}</code>
+      </div>
+      <p>Copy this code and use it to get your access token with the get-token.ps1 script.</p>
+      <a href="/" class="btn">Continue to Application</a>
+      <script>
+        console.log('Authorization Code:', '${code}');
+      </script>
+    </body>
+    </html>
+  `);
 });
 
 // API Routes

@@ -1,0 +1,26 @@
+// Simple script to guide through GoToWebinar token acquisition
+console.log('GoToWebinar Token Acquisition Guide');
+console.log('===================================');
+console.log('');
+console.log('STEP 1: Visit this URL in your browser:');
+console.log('https://api.getgo.com/oauth/v2/authorize?client_id=3610573d-7761-482c-94bf-5f8a4e92&response_type=code&redirect_uri=https://gtw-tools.vercel.app/oauth-callback');
+console.log('');
+console.log('STEP 2: After authorizing, you will be redirected to a URL like:');
+console.log('https://gtw-tools.vercel.app/oauth-callback?code=XXXX');
+console.log('');
+console.log('STEP 3: Copy the code parameter from the URL (this is your authorization code)');
+console.log('');
+console.log('STEP 4: Run the PowerShell script with the authorization code:');
+console.log('.\\get-token.ps1 -AuthCode "YOUR_AUTHORIZATION_CODE"');
+console.log('');
+console.log('STEP 5: Update your Vercel environment variables with the returned values');
+console.log('- GTW_ACCESS_TOKEN');
+console.log('- GTW_REFRESH_TOKEN');
+console.log('- GTW_ORGANIZER_KEY');
+console.log('');
+console.log('EXAMPLE CURL COMMAND:');
+console.log('curl -X POST "https://authentication.logmeininc.com/oauth/token" \\');
+console.log('  -H "Authorization: Basic MzYxMDU3M2QtNzc2MS00ODJjLTk0YmYtNWY4YTRlOTI6QzNpQndKdUdwRlJwelF6cnA0elZma3VP" \\');
+console.log('  -H "Accept: application/json" \\');
+console.log('  -H "Content-Type: application/x-www-form-urlencoded" \\');
+console.log('  -d "redirect_uri=https://gtw-tools.vercel.app/oauth-callback&grant_type=authorization_code&code=YOUR_AUTH_CODE"'); 

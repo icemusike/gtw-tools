@@ -12,6 +12,7 @@ import WebinarDetail from './pages/WebinarDetail';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
+import OAuthCallback from './pages/OAuthCallback';
 
 // API
 import { checkAuthStatus, refreshToken } from './api/auth';
@@ -104,8 +105,13 @@ const App = () => {
       }
     };
     
-    checkAuth();
-  }, [navigate]);
+    // Don't run the auth check if we're on the oauth-callback path
+    if (!location.pathname.includes('oauth-callback')) {
+      checkAuth();
+    } else {
+      setIsLoading(false);
+    }
+  }, [navigate, location]);
 
   // Handle OAuth callback
   useEffect(() => {
@@ -131,6 +137,11 @@ const App = () => {
     );
   }
 
+  // If on the oauth-callback path, show the OAuthCallback component
+  if (location.pathname.includes('oauth-callback')) {
+    return <OAuthCallback />;
+  }
+
   // If not authenticated, show login page
   if (!isAuthenticated && location.pathname !== '/login' && !location.search.includes('code=')) {
     return <Navigate to="/login" replace />;
@@ -149,6 +160,7 @@ const App = () => {
         
         <Routes>
           <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+          <Route path="/oauth-callback" element={<OAuthCallback />} />
           <Route path="/" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
           <Route path="/webinars" element={isAuthenticated ? <Webinars /> : <Navigate to="/login" />} />
           <Route path="/webinars/:webinarKey" element={isAuthenticated ? <WebinarDetail /> : <Navigate to="/login" />} />
