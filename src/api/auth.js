@@ -16,6 +16,7 @@ export const checkAuthStatus = async () => {
 export const getAuthUrl = async () => {
   try {
     const response = await axios.get(`${API_URL}/auth-url`);
+    console.log('Auth URL for authentication:', response.data.url);
     return response.data;
   } catch (error) {
     console.error('Failed to get auth URL:', error);
@@ -25,7 +26,9 @@ export const getAuthUrl = async () => {
 
 export const exchangeCodeForToken = async (code) => {
   try {
+    console.log('Exchanging code for token, code:', code);
     const response = await axios.post(`${API_URL}/auth/token`, { code });
+    console.log('Token exchange response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Failed to exchange code for token:', error);
