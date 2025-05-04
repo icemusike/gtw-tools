@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// Use relative API URL for production
 const API_URL = '/api';
 
 export const getSettings = async () => {

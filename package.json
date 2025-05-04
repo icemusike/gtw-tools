@@ -6,7 +6,11 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "vite"
+    "dev": "vite",
+    "server": "node index.js",
+    "dev:all": "concurrently \"npm run server\" \"npm run dev\"",
+    "build": "vite build",
+    "vercel-build": "vite build"
   },
   "dependencies": {
     "dotenv": "^16.3.1",
@@ -23,6 +27,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",
+    "concurrently": "^8.2.2",
     "vite": "^5.0.2"
   }
 }

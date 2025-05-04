@@ -25,18 +25,18 @@ const API_BASE = 'https://api.getgo.com/G2W/rest/v2';
 const appConfig = {
   clientId: process.env.GTW_CLIENT_ID,
   clientSecret: process.env.GTW_CLIENT_SECRET,
-  redirectUri: process.env.GTW_REDIRECT_URI,
-  baseCheckoutUrl: process.env.BASE_CHECKOUT_URL
+  redirectUri: process.env.GTW_REDIRECT_URI || 'https://gtw-tools.vercel.app/oauth-callback',
+  baseCheckoutUrl: process.env.BASE_CHECKOUT_URL || 'https://example.com/checkout'
 };
 
 // In-memory storage for tokens (in production, use a proper database)
 let tokenStore = {
-  accessToken: null,
-  refreshToken: null,
-  organizerKey: null
+  accessToken: process.env.GTW_ACCESS_TOKEN || '6142101059541651470_1lQbQJDdSqUtIoVrxATSdJg3S0dicp3Y',
+  refreshToken: process.env.GTW_REFRESH_TOKEN || null,
+  organizerKey: process.env.GTW_ORGANIZER_KEY || '6142101059541651470'
 };
 
-// Load tokens from file if exists
+// Load tokens from file if exists (for local development)
 try {
   const __dirname = dirname(fileURLToPath(import.meta.url));
   const tokenPath = join(__dirname, '.tokens.json');
@@ -47,7 +47,7 @@ try {
   console.error('Error loading tokens:', error);
 }
 
-// Save tokens to file
+// Save tokens to file (for local development)
 function saveTokens() {
   try {
     const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -65,7 +65,7 @@ let settings = {
   baseCheckoutUrl: process.env.BASE_CHECKOUT_URL || 'https://example.com/checkout'
 };
 
-// Load settings from file if exists
+// Load settings from file if exists (for local development)
 try {
   const __dirname = dirname(fileURLToPath(import.meta.url));
   const settingsPath = join(__dirname, '.settings.json');
@@ -76,7 +76,7 @@ try {
   console.error('Error loading settings:', error);
 }
 
-// Save settings to file
+// Save settings to file (for local development)
 function saveSettings() {
   try {
     const __dirname = dirname(fileURLToPath(import.meta.url));
