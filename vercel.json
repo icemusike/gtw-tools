@@ -15,7 +15,8 @@
       "config": {
         "distDir": "dist",
         "installCommand": "npm install",
-        "buildCommand": "npm run build"
+        "buildCommand": "npm run build",
+        "packageManager": "npm"
       }
     }
   ],
@@ -27,6 +28,18 @@
     {
       "src": "/oauth-callback",
       "dest": "index.js"
+    },
+    {
+      "src": "^/assets/(.*)$",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable",
+        "content-type": "application/javascript"
+      },
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "^/(.+\\.[a-zA-Z0-9]+)$",
+      "dest": "/$1"
     },
     {
       "src": "/(.*)",

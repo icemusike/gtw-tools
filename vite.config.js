@@ -12,4 +12,12 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    // Ensure proper MIME types for JavaScript modules
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
+  },
 });
