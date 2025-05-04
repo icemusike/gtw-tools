@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import { FaHome, FaVideo, FaCog, FaPaperPlane } from 'react-icons/fa';
+import { FaHome, FaVideo, FaCog, FaTachometerAlt } from 'react-icons/fa';
 
 const SidebarContainer = styled.aside`
   width: 250px;
@@ -11,10 +11,10 @@ const SidebarContainer = styled.aside`
   top: 0;
   left: 0;
   height: 100vh;
-  transition: transform 0.3s;
+  transition: all 0.3s ease;
   transform: translateX(${props => props.isOpen ? '0' : '-100%'});
   z-index: 1000;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-lg);
   border-right: 1px solid var(--gray-200);
   
   @media (max-width: 768px) {
@@ -23,21 +23,45 @@ const SidebarContainer = styled.aside`
 `;
 
 const SidebarHeader = styled.div`
-  padding: 1.5rem;
+  padding: 1.75rem 1.5rem;
   border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  background: linear-gradient(to right, var(--primary), var(--primary-dark));
+  color: white;
+`;
+
+const LogoContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const Logo = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  
+  svg {
+    color: var(--primary);
+    font-size: 20px;
+  }
 `;
 
 const SidebarTitle = styled.h1`
   font-size: 1.25rem;
   margin: 0;
-  color: var(--primary);
   font-weight: 700;
 `;
 
 const SidebarSubtitle = styled.p`
-  font-size: 0.875rem;
-  margin: 0.5rem 0 0;
-  color: var(--gray-500);
+  font-size: 0.75rem;
+  margin: 0.25rem 0 0;
+  opacity: 0.8;
 `;
 
 const SidebarNav = styled.nav`
@@ -47,28 +71,36 @@ const SidebarNav = styled.nav`
 const SidebarLink = styled(NavLink)`
   display: flex;
   align-items: center;
-  padding: 0.75rem 1.5rem;
+  padding: 0.875rem 1.5rem;
   color: var(--gray-700);
   transition: all 0.2s;
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
+  position: relative;
+  margin: 0.25rem 0.75rem;
+  border-radius: 8px;
   
   &:hover {
-    background-color: var(--gray-50);
+    background-color: var(--gray-100);
     color: var(--primary);
     text-decoration: none;
   }
   
   &.active {
-    background-color: var(--gray-100);
-    color: var(--primary);
-    border-left: 3px solid var(--primary);
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px rgba(79, 70, 229, 0.25);
+  }
+  
+  &.active svg {
+    color: white;
   }
   
   svg {
     margin-right: 0.75rem;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    color: var(--gray-500);
   }
 `;
 
@@ -91,13 +123,20 @@ const Sidebar = ({ isOpen }) => {
   return (
     <SidebarContainer isOpen={isOpen}>
       <SidebarHeader>
-        <SidebarTitle>GoToWebinar Sender</SidebarTitle>
-        <SidebarSubtitle>Affiliate Link Manager</SidebarSubtitle>
+        <LogoContainer>
+          <Logo>
+            <FaVideo />
+          </Logo>
+          <div>
+            <SidebarTitle>GTW Tools</SidebarTitle>
+            <SidebarSubtitle>Webinar & Affiliate Manager</SidebarSubtitle>
+          </div>
+        </LogoContainer>
       </SidebarHeader>
       
       <SidebarNav>
         <SidebarLink to="/" end>
-          <FaHome />
+          <FaTachometerAlt />
           Dashboard
         </SidebarLink>
         <SidebarLink to="/webinars">
@@ -111,7 +150,7 @@ const Sidebar = ({ isOpen }) => {
       </SidebarNav>
       
       <SidebarFooter>
-        <SidebarVersion>Version 1.0.0</SidebarVersion>
+        <SidebarVersion>Version 1.0.1</SidebarVersion>
       </SidebarFooter>
     </SidebarContainer>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FaSave, FaCog, FaLink, FaUserTag } from 'react-icons/fa';
+import { FaSave, FaCog, FaLink, FaUserTag, FaCheckCircle } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { getSettings, updateSettings } from '../api/settings';
 
@@ -8,11 +8,31 @@ const SettingsContainer = styled.div`
   margin-bottom: 2rem;
 `;
 
+const PageHeader = styled.div`
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const PageTitle = styled.h1`
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0;
+`;
+
+const PageDescription = styled.p`
+  color: var(--gray-600);
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+`;
+
 const SettingsCard = styled.div`
   background-color: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 1.75rem;
   margin-bottom: 1.5rem;
   border: 1px solid var(--gray-100);
 `;
@@ -26,23 +46,23 @@ const SettingsHeader = styled.div`
 `;
 
 const SettingsIcon = styled.div`
-  width: 40px;
-  height: 40px;
+  width: 46px;
+  height: 46px;
   border-radius: 10px;
   background-color: ${props => {
     switch(props.type) {
-      case 'primary': return '#eff6ff';
-      case 'success': return '#ecfdf5';
-      case 'danger': return '#fef2f2';
-      default: return '#eff6ff';
+      case 'primary': return 'rgba(79, 70, 229, 0.1)';
+      case 'success': return 'rgba(16, 185, 129, 0.1)';
+      case 'danger': return 'rgba(239, 68, 68, 0.1)';
+      default: return 'rgba(79, 70, 229, 0.1)';
     }
   }};
   color: ${props => {
     switch(props.type) {
-      case 'primary': return '#3b82f6';
-      case 'success': return '#10b981';
-      case 'danger': return '#ef4444';
-      default: return '#3b82f6';
+      case 'primary': return 'var(--primary)';
+      case 'success': return 'var(--secondary)';
+      case 'danger': return 'var(--danger)';
+      default: return 'var(--primary)';
     }
   }};
   display: flex;
@@ -60,7 +80,11 @@ const SettingsTitle = styled.h2`
 `;
 
 const FormGroup = styled.div`
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
+  
+  &:last-of-type {
+    margin-bottom: 0;
+  }
 `;
 
 const FormLabel = styled.label`
@@ -73,10 +97,10 @@ const FormLabel = styled.label`
 
 const FormInput = styled.input`
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.875rem;
   border: 1px solid var(--gray-300);
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
   transition: all 0.2s;
   
   &:focus {
@@ -88,10 +112,10 @@ const FormInput = styled.input`
 
 const FormTextarea = styled.textarea`
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.875rem;
   border: 1px solid var(--gray-300);
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
   min-height: 120px;
   resize: vertical;
   transition: all 0.2s;
@@ -105,7 +129,7 @@ const FormTextarea = styled.textarea`
 
 const FormHelp = styled.small`
   display: block;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
   color: var(--gray-600);
   font-size: 0.75rem;
 `;
@@ -113,15 +137,17 @@ const FormHelp = styled.small`
 const SaveButton = styled.button`
   display: flex;
   align-items: center;
-  padding: 0.75rem 1.5rem;
+  justify-content: center;
+  padding: 0.875rem 1.5rem;
   background-color: var(--primary);
   color: white;
   border: none;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  min-width: 120px;
   
   &:hover {
     background-color: var(--primary-dark);
@@ -137,6 +163,19 @@ const SaveButton = styled.button`
   }
 `;
 
+const SaveSuccess = styled.span`
+  display: flex;
+  align-items: center;
+  color: var(--secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-right: 1rem;
+  
+  svg {
+    margin-right: 0.375rem;
+  }
+`;
+
 const Settings = () => {
   const [settings, setSettings] = useState({
     messageTemplate: '',
@@ -145,6 +184,7 @@ const Settings = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   
   useEffect(() => {
     const fetchSettings = async () => {
@@ -153,7 +193,7 @@ const Settings = () => {
         setSettings({
           messageTemplate: data.messageTemplate || 'Here is your personal checkout link: {{checkoutLink}}',
           defaultAffiliateId: data.defaultAffiliateId || 'default',
-          baseCheckoutUrl: data.baseCheckoutUrl || 'https://example.com/checkout'
+          baseCheckoutUrl: data.baseCheckoutUrl || process.env.BASE_CHECKOUT_URL || 'https://example.com/checkout'
         });
       } catch (error) {
         console.error('Error fetching settings:', error);
@@ -172,6 +212,11 @@ const Settings = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Reset success state when form is changed
+    if (saveSuccess) {
+      setSaveSuccess(false);
+    }
   };
   
   const handleSubmit = async (e) => {
@@ -187,7 +232,13 @@ const Settings = () => {
       setIsSaving(true);
       
       await updateSettings(settings);
+      setSaveSuccess(true);
       toast.success('Settings saved successfully');
+      
+      // Reset success state after 3 seconds
+      setTimeout(() => {
+        setSaveSuccess(false);
+      }, 3000);
     } catch (error) {
       console.error('Error saving settings:', error);
       toast.error('Failed to save settings');
@@ -207,7 +258,12 @@ const Settings = () => {
   
   return (
     <SettingsContainer>
-      <h1 className="mb-4 text-2xl font-bold text-gray-900">Settings</h1>
+      <PageHeader>
+        <div>
+          <PageTitle>Settings</PageTitle>
+          <PageDescription>Configure your webinar message settings</PageDescription>
+        </div>
+      </PageHeader>
       
       <form onSubmit={handleSubmit}>
         <SettingsCard>
@@ -264,7 +320,12 @@ const Settings = () => {
           </FormGroup>
         </SettingsCard>
         
-        <div className="text-right">
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+          {saveSuccess && (
+            <SaveSuccess>
+              <FaCheckCircle /> Settings saved successfully
+            </SaveSuccess>
+          )}
           <SaveButton type="submit" disabled={isSaving}>
             {isSaving ? (
               <>

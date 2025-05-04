@@ -19,18 +19,50 @@ import { checkAuthStatus } from './api/auth';
 const AppContainer = styled.div`
   display: flex;
   min-height: 100vh;
+  background-color: #f9fafb;
 `;
 
 const MainContent = styled.main`
   flex: 1;
   padding: 2rem;
   margin-left: 250px;
-  transition: margin-left 0.3s;
+  transition: all 0.3s ease;
   
   @media (max-width: 768px) {
     margin-left: ${props => props.sidebarOpen ? '250px' : '0'};
-    padding: 1rem;
+    padding: 1.5rem;
   }
+`;
+
+const LoadingScreen = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f9fafb;
+`;
+
+const LoadingSpinner = styled.div`
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(79, 70, 229, 0.2);
+  border-radius: 50%;
+  border-top-color: var(--primary);
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const LoadingText = styled.p`
+  color: var(--gray-700);
+  font-size: 1rem;
+  font-weight: 500;
 `;
 
 const App = () => {
@@ -72,10 +104,10 @@ const App = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="spinner"></div>
-        <p className="ml-3">Loading...</p>
-      </div>
+      <LoadingScreen>
+        <LoadingSpinner />
+        <LoadingText>Loading your dashboard...</LoadingText>
+      </LoadingScreen>
     );
   }
 

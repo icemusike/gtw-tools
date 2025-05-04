@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { FaVideo, FaCog, FaUsers, FaPaperPlane, FaExternalLinkAlt, FaCalendarAlt, FaPlayCircle } from 'react-icons/fa';
+import { FaVideo, FaCog, FaUsers, FaPaperPlane, FaExternalLinkAlt, FaCalendarAlt, FaPlayCircle, FaChartBar, FaChartLine, FaChartPie, FaArrowRight } from 'react-icons/fa';
 import { getWebinars } from '../api/webinars';
 import { getSettings } from '../api/settings';
 
@@ -9,54 +9,75 @@ const DashboardContainer = styled.div`
   margin-bottom: 2rem;
 `;
 
+const DashboardHeader = styled.div`
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const PageTitle = styled.h1`
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0;
+`;
+
+const WelcomeText = styled.p`
+  color: var(--gray-600);
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+`;
+
 const StatsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 `;
 
 const StatCard = styled.div`
   background-color: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 1.75rem;
   display: flex;
   align-items: center;
+  transition: all 0.3s ease;
   border: 1px solid var(--gray-100);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--gray-200);
   }
 `;
 
 const StatIcon = styled.div`
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   border-radius: 12px;
   background-color: ${props => {
     switch(props.type) {
-      case 'primary': return '#eff6ff';
-      case 'success': return '#ecfdf5';
-      case 'danger': return '#fef2f2';
-      default: return '#eff6ff';
+      case 'primary': return 'rgba(79, 70, 229, 0.1)';
+      case 'success': return 'rgba(16, 185, 129, 0.1)';
+      case 'danger': return 'rgba(239, 68, 68, 0.1)';
+      default: return 'rgba(79, 70, 229, 0.1)';
     }
   }};
   color: ${props => {
     switch(props.type) {
-      case 'primary': return '#3b82f6';
-      case 'success': return '#10b981';
-      case 'danger': return '#ef4444';
-      default: return '#3b82f6';
+      case 'primary': return 'var(--primary)';
+      case 'success': return 'var(--secondary)';
+      case 'danger': return 'var(--danger)';
+      default: return 'var(--primary)';
     }
   }};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  margin-right: 1rem;
+  margin-right: 1.25rem;
 `;
 
 const StatContent = styled.div`
@@ -64,7 +85,7 @@ const StatContent = styled.div`
 `;
 
 const StatValue = styled.div`
-  font-size: 1.75rem;
+  font-size: 1.875rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
   color: var(--gray-900);
@@ -73,6 +94,7 @@ const StatValue = styled.div`
 const StatLabel = styled.div`
   font-size: 0.875rem;
   color: var(--gray-600);
+  font-weight: 500;
 `;
 
 const ContentGrid = styled.div`
@@ -87,22 +109,22 @@ const ContentGrid = styled.div`
 
 const SectionCard = styled.div`
   background-color: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 1.75rem;
   border: 1px solid var(--gray-100);
 `;
 
 const SectionTitle = styled.h2`
   font-size: 1.125rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
   color: var(--gray-900);
   font-weight: 600;
   display: flex;
   align-items: center;
   
   svg {
-    margin-right: 0.5rem;
+    margin-right: 0.75rem;
     color: var(--primary);
   }
 `;
@@ -114,23 +136,25 @@ const WebinarList = styled.div`
 
 const WebinarCard = styled(Link)`
   display: block;
-  padding: 1rem;
-  border-radius: 0.5rem;
+  padding: 1.25rem;
+  border-radius: 10px;
+  background-color: var(--white);
   border: 1px solid var(--gray-200);
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   text-decoration: none;
   color: inherit;
+  box-shadow: var(--shadow-sm);
   
   &:hover {
     border-color: var(--primary-light);
-    background-color: var(--gray-50);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
     text-decoration: none;
-    transform: translateX(3px);
+    transform: translateX(4px);
   }
 `;
 
 const WebinarTitle = styled.h3`
-  font-size: 0.875rem;
+  font-size: 0.95rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
   color: var(--gray-800);
@@ -144,6 +168,7 @@ const WebinarDate = styled.div`
   color: var(--gray-600);
   display: flex;
   align-items: center;
+  margin-top: 0.75rem;
   
   svg {
     margin-right: 0.375rem;
@@ -154,24 +179,24 @@ const WebinarDate = styled.div`
 const WebinarStatus = styled.span`
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.5rem;
-  border-radius: 9999px;
-  font-size: 0.625rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.6875rem;
   font-weight: 600;
   background-color: ${props => {
     switch (props.status) {
-      case 'SCHEDULED': return '#eff6ff';
-      case 'LIVE': return '#ecfdf5';
-      case 'COMPLETED': return '#f3f4f6';
-      default: return '#f3f4f6';
+      case 'SCHEDULED': return 'rgba(79, 70, 229, 0.1)';
+      case 'LIVE': return 'rgba(16, 185, 129, 0.1)';
+      case 'COMPLETED': return 'rgba(107, 114, 128, 0.1)';
+      default: return 'rgba(107, 114, 128, 0.1)';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'SCHEDULED': return '#1e40af';
-      case 'LIVE': return '#065f46';
-      case 'COMPLETED': return '#4b5563';
-      default: return '#4b5563';
+      case 'SCHEDULED': return 'var(--primary)';
+      case 'LIVE': return 'var(--secondary)';
+      case 'COMPLETED': return 'var(--gray-600)';
+      default: return 'var(--gray-600)';
     }
   }};
 `;
@@ -179,57 +204,125 @@ const WebinarStatus = styled.span`
 const ActionButton = styled(Link)`
   display: flex;
   align-items: center;
-  padding: 0.875rem 1rem;
-  border-radius: 0.5rem;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  background-color: var(--white);
   border: 1px solid var(--gray-200);
-  margin-bottom: 0.75rem;
-  transition: all 0.2s;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
   text-decoration: none;
   color: var(--gray-800);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
+  box-shadow: var(--shadow-sm);
   
   &:hover {
     border-color: var(--primary-light);
-    background-color: var(--gray-50);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
     text-decoration: none;
-    transform: translateX(3px);
+    transform: translateX(4px);
   }
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const ActionIcon = styled.div`
+  display: flex;
+  align-items: center;
   
   svg {
     margin-right: 0.75rem;
     color: var(--primary);
-    font-size: 1rem;
+    font-size: 1.125rem;
+  }
+`;
+
+const ActionArrow = styled.div`
+  color: var(--gray-400);
+  transition: all 0.2s;
+  
+  ${ActionButton}:hover & {
+    color: var(--primary);
+    transform: translateX(3px);
   }
 `;
 
 const EmptyState = styled.div`
   text-align: center;
-  padding: 2rem 1rem;
+  padding: 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const EmptyStateIcon = styled.div`
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background-color: rgba(79, 70, 229, 0.1);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  margin-bottom: 1.25rem;
 `;
 
 const EmptyStateText = styled.p`
-  color: var(--gray-500);
+  color: var(--gray-600);
+  font-size: 0.95rem;
+  margin-bottom: 1.25rem;
+  max-width: 300px;
+`;
+
+const EmptyStateButton = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background-color: var(--primary);
+  color: white;
+  border-radius: 8px;
   font-size: 0.875rem;
-  margin-bottom: 1rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  text-decoration: none;
+  
+  &:hover {
+    background-color: var(--primary-dark);
+    text-decoration: none;
+  }
+  
+  svg {
+    margin-left: 0.5rem;
+  }
 `;
 
 const ViewAllLink = styled(Link)`
   display: inline-flex;
   align-items: center;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--primary);
-  margin-top: 1rem;
+  margin-top: 1.25rem;
+  transition: all 0.2s;
   
   svg {
-    margin-left: 0.25rem;
-    font-size: 0.75rem;
+    margin-left: 0.375rem;
+    font-size: 0.8125rem;
+    transition: transform 0.2s;
   }
   
   &:hover {
     text-decoration: none;
     color: var(--primary-dark);
+    
+    svg {
+      transform: translateX(3px);
+    }
   }
 `;
 
@@ -273,9 +366,22 @@ const Dashboard = () => {
   // Count live webinars
   const liveWebinars = webinars.filter(w => w.status === 'LIVE').length;
   
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+  
   return (
     <DashboardContainer>
-      <h1 className="mb-4 text-2xl font-bold text-gray-900">Dashboard</h1>
+      <DashboardHeader>
+        <div>
+          <PageTitle>Dashboard</PageTitle>
+          <WelcomeText>Welcome back! Today is {formattedDate}</WelcomeText>
+        </div>
+      </DashboardHeader>
       
       <StatsGrid>
         <StatCard>
@@ -312,14 +418,19 @@ const Dashboard = () => {
       <ContentGrid>
         <SectionCard>
           <SectionTitle>
-            <FaVideo />
+            <FaChartBar />
             Recent Webinars
           </SectionTitle>
           
           {webinars.length === 0 ? (
             <EmptyState>
-              <EmptyStateText>No webinars found.</EmptyStateText>
-              <Link to="/webinars" className="btn btn-primary">Browse Webinars</Link>
+              <EmptyStateIcon>
+                <FaVideo />
+              </EmptyStateIcon>
+              <EmptyStateText>No webinars found in your account.</EmptyStateText>
+              <EmptyStateButton to="/webinars">
+                Browse Webinars <FaArrowRight />
+              </EmptyStateButton>
             </EmptyState>
           ) : (
             <>
@@ -339,9 +450,9 @@ const Dashboard = () => {
                 ))}
               </WebinarList>
               
-              <div className="text-right mt-3">
+              <div className="text-right">
                 <ViewAllLink to="/webinars">
-                  View All Webinars <FaExternalLinkAlt />
+                  View All Webinars <FaArrowRight />
                 </ViewAllLink>
               </div>
             </>
@@ -350,25 +461,40 @@ const Dashboard = () => {
         
         <SectionCard>
           <SectionTitle>
-            <FaPaperPlane />
+            <FaChartLine />
             Quick Actions
           </SectionTitle>
           
           <ActionButton to="/webinars">
-            <FaVideo />
-            Browse Webinars
+            <ActionIcon>
+              <FaVideo />
+              Browse Webinars
+            </ActionIcon>
+            <ActionArrow>
+              <FaArrowRight />
+            </ActionArrow>
           </ActionButton>
           
           {liveWebinars > 0 && (
             <ActionButton to={`/webinars/${webinars.find(w => w.status === 'LIVE')?.webinarKey}`}>
-              <FaPaperPlane />
-              Send Messages to Live Webinar
+              <ActionIcon>
+                <FaPaperPlane />
+                Send Messages
+              </ActionIcon>
+              <ActionArrow>
+                <FaArrowRight />
+              </ActionArrow>
             </ActionButton>
           )}
           
           <ActionButton to="/settings">
-            <FaCog />
-            Configure Settings
+            <ActionIcon>
+              <FaCog />
+              Configure Settings
+            </ActionIcon>
+            <ActionArrow>
+              <FaArrowRight />
+            </ActionArrow>
           </ActionButton>
         </SectionCard>
       </ContentGrid>

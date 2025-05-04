@@ -3,6 +3,16 @@ import axios from 'axios';
 // Use relative API URL for production
 const API_URL = '/api';
 
+export const checkAuthStatus = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/auth/status`);
+    return response.data;
+  } catch (error) {
+    console.error('Auth status check failed:', error);
+    return { authenticated: false };
+  }
+};
+
 export const getAuthUrl = async () => {
   const response = await axios.get(`${API_URL}/auth-url`);
   return response.data;
@@ -15,10 +25,5 @@ export const exchangeCodeForToken = async (code) => {
 
 export const refreshToken = async () => {
   const response = await axios.post(`${API_URL}/auth/refresh`);
-  return response.data;
-};
-
-export const checkAuthStatus = async () => {
-  const response = await axios.get(`${API_URL}/auth/status`);
   return response.data;
 };
