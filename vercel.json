@@ -45,5 +45,10 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "env": {
+    "GTW_ACCESS_TOKEN": "6142101059541651470_1lQbQJDdSqUtIoVrxATSdJg3S0dicp3Y",
+    "GTW_ORGANIZER_KEY": "6142101059541651470",
+    "BASE_CHECKOUT_URL": "https://example.com/checkout"
+  }
 }

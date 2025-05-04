@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { FaBars, FaSignOutAlt, FaCog } from 'react-icons/fa';
+import { FaBars, FaCog } from 'react-icons/fa';
 
 const NavbarContainer = styled.nav`
   display: flex;
@@ -9,11 +9,11 @@ const NavbarContainer = styled.nav`
   align-items: center;
   padding: 1rem 0;
   margin-bottom: 2rem;
-  border-bottom: 1px solid var(--gray-300);
+  border-bottom: 1px solid var(--gray-200);
 `;
 
 const NavbarBrand = styled.div`
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--primary);
 `;
@@ -40,14 +40,22 @@ const NavbarActions = styled.div`
 
 const NavbarAction = styled(Link)`
   color: var(--gray-700);
-  font-size: 1rem;
+  font-size: 0.875rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
   
   &:hover {
     color: var(--primary);
+    background-color: var(--gray-100);
     text-decoration: none;
+  }
+  
+  svg {
+    font-size: 1rem;
   }
 `;
 

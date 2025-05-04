@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FaSave, FaCog } from 'react-icons/fa';
+import { FaSave, FaCog, FaLink, FaUserTag } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { getSettings, updateSettings } from '../api/settings';
 
@@ -10,10 +10,11 @@ const SettingsContainer = styled.div`
 
 const SettingsCard = styled.div`
   background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
+  border: 1px solid var(--gray-100);
 `;
 
 const SettingsHeader = styled.div`
@@ -27,9 +28,23 @@ const SettingsHeader = styled.div`
 const SettingsIcon = styled.div`
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  background-color: var(--primary);
-  color: white;
+  border-radius: 10px;
+  background-color: ${props => {
+    switch(props.type) {
+      case 'primary': return '#eff6ff';
+      case 'success': return '#ecfdf5';
+      case 'danger': return '#fef2f2';
+      default: return '#eff6ff';
+    }
+  }};
+  color: ${props => {
+    switch(props.type) {
+      case 'primary': return '#3b82f6';
+      case 'success': return '#10b981';
+      case 'danger': return '#ef4444';
+      default: return '#3b82f6';
+    }
+  }};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,7 +54,9 @@ const SettingsIcon = styled.div`
 
 const SettingsTitle = styled.h2`
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gray-900);
 `;
 
 const FormGroup = styled.div`
@@ -50,19 +67,22 @@ const FormLabel = styled.label`
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--gray-700);
 `;
 
 const FormInput = styled.input`
   width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--gray-300);
-  border-radius: 4px;
-  font-size: 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
   
   &:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(0, 120, 215, 0.25);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
   }
 `;
 
@@ -70,15 +90,16 @@ const FormTextarea = styled.textarea`
   width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--gray-300);
-  border-radius: 4px;
-  font-size: 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
   min-height: 120px;
   resize: vertical;
+  transition: all 0.2s;
   
   &:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(0, 120, 215, 0.25);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
   }
 `;
 
@@ -96,11 +117,11 @@ const SaveButton = styled.button`
   background-color: var(--primary);
   color: white;
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
   
   &:hover {
     background-color: var(--primary-dark);
@@ -156,14 +177,15 @@ const Settings = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!settings.messageTemplate.includes('{{checkoutLink}}')) {
-      toast.error('Message template must include {{checkoutLink}} placeholder');
-      return;
-    }
-    
-    setIsSaving(true);
-    
     try {
+      // Fix for the checkoutLink reference error
+      if (!settings.messageTemplate.includes('{{checkoutLink}}')) {
+        toast.error('Message template must include {{checkoutLink}} placeholder');
+        return;
+      }
+      
+      setIsSaving(true);
+      
       await updateSettings(settings);
       toast.success('Settings saved successfully');
     } catch (error) {
@@ -185,12 +207,12 @@ const Settings = () => {
   
   return (
     <SettingsContainer>
-      <h1 className="mb-4">Settings</h1>
+      <h1 className="mb-4 text-2xl font-bold text-gray-900">Settings</h1>
       
       <form onSubmit={handleSubmit}>
         <SettingsCard>
           <SettingsHeader>
-            <SettingsIcon>
+            <SettingsIcon type="primary">
               <FaCog />
             </SettingsIcon>
             <SettingsTitle>Message Settings</SettingsTitle>

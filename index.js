@@ -497,6 +497,16 @@ async function refreshToken() {
   saveTokens();
 }
 
+// Debug endpoint to check token status
+app.get('/api/debug/token', (req, res) => {
+  res.json({
+    hasAccessToken: !!tokenStore.accessToken,
+    accessTokenPrefix: tokenStore.accessToken ? tokenStore.accessToken.substring(0, 10) + '...' : null,
+    hasRefreshToken: !!tokenStore.refreshToken,
+    organizerKey: tokenStore.organizerKey
+  });
+});
+
 // Serve static files from the frontend build directory
 const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(join(__dirname, 'dist')));
