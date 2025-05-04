@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "description": "Updated configuration for auto-deployment",
   "buildCommand": "npm install && npm run build",
   "installCommand": "npm install",
   "framework": "vite",
