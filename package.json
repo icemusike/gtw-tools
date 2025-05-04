@@ -10,7 +10,7 @@
     "server": "node index.js",
     "dev:all": "concurrently \"npm run server\" \"npm run dev\"",
     "build": "vite build",
-    "vercel-build": "vite build"
+    "vercel-build": "pnpm install --no-frozen-lockfile && vite build"
   },
   "dependencies": {
     "dotenv": "^16.3.1",
