@@ -22,6 +22,38 @@
   ],
   "routes": [
     {
+      "src": "/api/auth/status",
+      "dest": "index.js"
+    },
+    {
+      "src": "/api/auth/token",
+      "dest": "index.js"
+    },
+    {
+      "src": "/api/auth/refresh",
+      "dest": "index.js"
+    },
+    {
+      "src": "/api/auth-url",
+      "dest": "index.js"
+    },
+    {
+      "src": "/api/debug/token",
+      "dest": "index.js"
+    },
+    {
+      "src": "/api/webinars",
+      "dest": "index.js"
+    },
+    {
+      "src": "/api/webinars/(.*)",
+      "dest": "index.js"
+    },
+    {
+      "src": "/api/settings",
+      "dest": "index.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "index.js"
     },

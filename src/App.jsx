@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
@@ -14,7 +14,7 @@ import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 
 // API
-import { checkAuthStatus } from './api/auth';
+import { checkAuthStatus, refreshToken } from './api/auth';
 
 const AppContainer = styled.div`
   display: flex;
@@ -70,22 +70,42 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { authenticated } = await checkAuthStatus();
-        setIsAuthenticated(authenticated);
+        const { authenticated, accessTokenLength } = await checkAuthStatus();
+        
+        if (authenticated && accessTokenLength > 0) {
+          setIsAuthenticated(true);
+        } else {
+          // If we have a refresh token, try to refresh
+          try {
+            const refreshResult = await refreshToken();
+            if (refreshResult.success) {
+              setIsAuthenticated(true);
+            } else {
+              setIsAuthenticated(false);
+              navigate('/login');
+            }
+          } catch (refreshError) {
+            console.error('Refresh token failed:', refreshError);
+            setIsAuthenticated(false);
+            navigate('/login');
+          }
+        }
       } catch (error) {
         console.error('Auth check failed:', error);
         setIsAuthenticated(false);
+        navigate('/login');
       } finally {
         setIsLoading(false);
       }
     };
     
     checkAuth();
-  }, []);
+  }, [navigate]);
 
   // Handle OAuth callback
   useEffect(() => {
@@ -129,10 +149,10 @@ const App = () => {
         
         <Routes>
           <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/webinars" element={<Webinars />} />
-          <Route path="/webinars/:webinarKey" element={<WebinarDetail />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+          <Route path="/webinars" element={isAuthenticated ? <Webinars /> : <Navigate to="/login" />} />
+          <Route path="/webinars/:webinarKey" element={isAuthenticated ? <WebinarDetail /> : <Navigate to="/login" />} />
+          <Route path="/settings" element={isAuthenticated ? <Settings /> : <Navigate to="/login" />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </MainContent>
