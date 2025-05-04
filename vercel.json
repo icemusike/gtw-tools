@@ -1,8 +1,9 @@
 {
   "version": 2,
+  "description": "Updated configuration for auto-deployment",
   "buildCommand": "npm install && npm run build",
   "installCommand": "npm install",
-  "framework": null,
+  "framework": "vite",
   "outputDirectory": "dist",
   "builds": [
     {
@@ -54,4 +55,4 @@
     "GTW_ORGANIZER_KEY": "@gtw_organizer_key",
     "BASE_CHECKOUT_URL": "@base_checkout_url"
   }
-}
+} 
