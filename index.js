@@ -31,10 +31,23 @@ const appConfig = {
 
 // In-memory storage for tokens (in production, use a proper database)
 let tokenStore = {
-  accessToken: process.env.GTW_ACCESS_TOKEN || '6142101059541651470_1lQbQJDdSqUtIoVrxATSdJg3S0dicp3Y',
+  accessToken: process.env.GTW_ACCESS_TOKEN || null,
   refreshToken: process.env.GTW_REFRESH_TOKEN || null,
-  organizerKey: process.env.GTW_ORGANIZER_KEY || '6142101059541651470'
+  organizerKey: process.env.GTW_ORGANIZER_KEY || null
 };
+
+// Log environment variable status
+console.log('Environment variables status:');
+console.log('- GTW_CLIENT_ID available:', !!process.env.GTW_CLIENT_ID);
+console.log('- GTW_CLIENT_SECRET available:', !!process.env.GTW_CLIENT_SECRET);
+console.log('- GTW_ACCESS_TOKEN available:', !!process.env.GTW_ACCESS_TOKEN);
+console.log('- GTW_ORGANIZER_KEY available:', !!process.env.GTW_ORGANIZER_KEY);
+
+// Initialize token store
+console.log('Token store initialized:');
+console.log('- Access token available:', !!tokenStore.accessToken);
+console.log('- Refresh token available:', !!tokenStore.refreshToken);
+console.log('- Organizer key available:', !!tokenStore.organizerKey);
 
 // Load tokens from file if exists (for local development)
 try {
@@ -186,19 +199,29 @@ app.post('/api/auth/refresh', async (req, res) => {
 
 // Check auth status
 app.get('/api/auth/status', (req, res) => {
+  const accessTokenAvailable = !!tokenStore.accessToken;
+  console.log('Auth status check:');
+  console.log('- Access token available:', accessTokenAvailable);
+  console.log('- Organizer key:', tokenStore.organizerKey);
+
   res.json({ 
-    authenticated: !!tokenStore.accessToken,
-    organizerKey: tokenStore.organizerKey
+    authenticated: accessTokenAvailable,
+    organizerKey: tokenStore.organizerKey,
+    accessTokenStart: accessTokenAvailable ? tokenStore.accessToken.substring(0, 15) + '...' : null,
+    accessTokenLength: accessTokenAvailable ? tokenStore.accessToken.length : 0
   });
 });
 
 // Get webinars
 app.get('/api/webinars', async (req, res) => {
   if (!tokenStore.accessToken) {
-    return res.status(401).json({ error: 'Not authenticated' });
+    return res.status(401).json({ error: 'Not authenticated', message: 'No access token available' });
   }
   
   try {
+    console.log(`Making request to GTW API with organizerKey: ${tokenStore.organizerKey.substring(0, 8)}...`);
+    console.log(`Access token starts with: ${tokenStore.accessToken.substring(0, 15)}...`);
+    
     const response = await axios.get(`${API_BASE}/organizers/${tokenStore.organizerKey}/webinars`, {
       headers: {
         'Authorization': `Bearer ${tokenStore.accessToken}`
@@ -207,9 +230,13 @@ app.get('/api/webinars', async (req, res) => {
     
     res.json(response.data);
   } catch (error) {
+    console.error('Error fetching webinars:', error.message);
+    console.error('Response details:', error.response?.data);
+    
     // Check if it's an auth error and try to refresh
     if (error.response?.status === 401 && tokenStore.refreshToken) {
       try {
+        console.log('Attempting to refresh token...');
         await refreshToken();
         
         // Retry the request
@@ -221,13 +248,19 @@ app.get('/api/webinars', async (req, res) => {
         
         return res.json(response.data);
       } catch (refreshError) {
-        return res.status(401).json({ error: 'Authentication failed', details: refreshError.message });
+        console.error('Token refresh failed:', refreshError.message);
+        return res.status(401).json({ 
+          error: 'Authentication failed after refresh attempt', 
+          details: refreshError.message,
+          originalError: error.message
+        });
       }
     }
     
     res.status(error.response?.status || 500).json({ 
       error: 'Failed to fetch webinars', 
-      details: error.response?.data || error.message 
+      details: error.response?.data || error.message,
+      statusCode: error.response?.status
     });
   }
 });
@@ -501,9 +534,17 @@ async function refreshToken() {
 app.get('/api/debug/token', (req, res) => {
   res.json({
     hasAccessToken: !!tokenStore.accessToken,
-    accessTokenPrefix: tokenStore.accessToken ? tokenStore.accessToken.substring(0, 10) + '...' : null,
+    accessTokenPrefix: tokenStore.accessToken ? tokenStore.accessToken.substring(0, 20) + '...' : null,
     hasRefreshToken: !!tokenStore.refreshToken,
-    organizerKey: tokenStore.organizerKey
+    organizerKey: tokenStore.organizerKey,
+    clientId: appConfig.clientId ? appConfig.clientId.substring(0, 10) + '...' : 'undefined',
+    clientSecret: appConfig.clientSecret ? 'present (hidden)' : 'undefined',
+    envVars: {
+      GTW_CLIENT_ID: process.env.GTW_CLIENT_ID ? 'present' : 'undefined',
+      GTW_CLIENT_SECRET: process.env.GTW_CLIENT_SECRET ? 'present' : 'undefined',
+      GTW_ACCESS_TOKEN: process.env.GTW_ACCESS_TOKEN ? 'present' : 'undefined',
+      GTW_ORGANIZER_KEY: process.env.GTW_ORGANIZER_KEY ? 'present' : 'undefined'
+    }
   });
 });
 
