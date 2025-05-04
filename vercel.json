@@ -45,13 +45,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "GTW_CLIENT_ID": "@gtw_client_id",
-    "GTW_CLIENT_SECRET": "@gtw_client_secret",
-    "GTW_REDIRECT_URI": "@gtw_redirect_uri",
-    "GTW_ACCESS_TOKEN": "@gtw_access_token",
-    "GTW_ORGANIZER_KEY": "@gtw_organizer_key",
-    "BASE_CHECKOUT_URL": "@base_checkout_url"
-  }
+  ]
 } 
