@@ -45,5 +45,13 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "env": {
+    "GTW_CLIENT_ID": "${GTW_CLIENT_ID}",
+    "GTW_CLIENT_SECRET": "${GTW_CLIENT_SECRET}",
+    "GTW_REDIRECT_URI": "${GTW_REDIRECT_URI}",
+    "GTW_ACCESS_TOKEN": "${GTW_ACCESS_TOKEN}",
+    "GTW_ORGANIZER_KEY": "${GTW_ORGANIZER_KEY}",
+    "BASE_CHECKOUT_URL": "${BASE_CHECKOUT_URL}"
+  }
 } 
